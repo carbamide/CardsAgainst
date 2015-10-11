@@ -91,7 +91,7 @@ final class MenuViewController: UIViewController, UICollectionViewDataSource, UI
 
     private func setupSeparator() {
         // Separator
-        separator.setTranslatesAutoresizingMaskIntoConstraints(false)
+        separator.translatesAutoresizingMaskIntoConstraints = false
         separator.backgroundColor = lightColor
         view.addSubview(separator)
 
@@ -106,13 +106,13 @@ final class MenuViewController: UIViewController, UICollectionViewDataSource, UI
 
     private func setupCollectionView() {
         // Collection View
-        let cvLayout = collectionView.collectionViewLayout as UICollectionViewFlowLayout
+        let cvLayout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
         cvLayout.itemSize = CGSizeMake(separator.frame.size.width, 50)
         cvLayout.minimumLineSpacing = 0
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.backgroundColor = UIColor.clearColor()
-        collectionView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.registerClass(PlayerCell.self,
             forCellWithReuseIdentifier: PlayerCell.reuseID)
         collectionView.alwaysBounceVertical = true
@@ -136,7 +136,7 @@ final class MenuViewController: UIViewController, UICollectionViewDataSource, UI
         startGame(blackCard: blackCard, whiteCards: whiteCards)
     }
 
-    private func startGame(#blackCard: Card, whiteCards: [Card]) {
+    private func startGame(blackCard blackCard: Card, whiteCards: [Card]) {
         let gameVC = GameViewController(blackCard: blackCard, whiteCards: whiteCards)
         navigationController!.pushViewController(gameVC, animated: true)
     }
@@ -163,7 +163,7 @@ final class MenuViewController: UIViewController, UICollectionViewDataSource, UI
     }
 
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PlayerCell.reuseID, forIndexPath: indexPath) as PlayerCell
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PlayerCell.reuseID, forIndexPath: indexPath) as! PlayerCell
         cell.label.text = ConnectionManager.otherPlayers[indexPath.row].name
         return cell
     }

@@ -49,7 +49,7 @@ struct CardManager {
     private static func takeRandom<U>(inout mutable: [U], original: [U]) -> U {
         if mutable.count == 0 {
             // reshuffle
-            mutable = original.sorted { _ in arc4random() % 2 == 0 }
+            mutable = original.sort { _ in arc4random() % 2 == 0 }
         }
         return mutable.removeLast()
     }

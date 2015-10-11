@@ -19,7 +19,7 @@ private func easeInOut(var t: CGFloat, b: CGFloat, c: CGFloat, d: CGFloat) -> CG
 
 final class WhiteCardFlowLayout: UICollectionViewFlowLayout {
 
-    override func layoutAttributesForElementsInRect(rect: CGRect) -> [AnyObject]? {
+    override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         let layoutAttributes = super.layoutAttributesForElementsInRect(rect)
         let topContentInset = collectionView!.contentInset.top + 20
         let transitionRegion = CGFloat(120)

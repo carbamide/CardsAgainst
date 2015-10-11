@@ -16,13 +16,13 @@ final class TouchableLabel: UILabel {
         userInteractionEnabled = true
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     private func setLastTokenAlpha(alpha: CGFloat) {
         if let lastRange = placeholderRanges.last {
-            let mAttributedText = attributedText.mutableCopy() as NSMutableAttributedString
+            let mAttributedText = attributedText.mutableCopy() as! NSMutableAttributedString
             mAttributedText.addAttribute(NSForegroundColorAttributeName, value: tintColor.colorWithAlphaComponent(alpha), range: lastRange)
             attributedText = mAttributedText
         }
