@@ -13,7 +13,7 @@ final class MenuViewController: UIViewController, UICollectionViewDataSource, UI
 
     // MARK: Properties
 
-    private let startGameButton = UIButton.buttonWithType(.System) as UIButton
+    private let startGameButton = UIButton(type: .System) as UIButton
     private let separator = UIView()
     private let collectionView = UICollectionView(frame: CGRectZero,
         collectionViewLayout: UICollectionViewFlowLayout())
@@ -41,7 +41,7 @@ final class MenuViewController: UIViewController, UICollectionViewDataSource, UI
             self.updatePlayers()
         }
         ConnectionManager.onEvent(.StartGame) { _, object in
-            let dict = object as [String: NSData]
+            let dict = object as! [String: NSData]
             let blackCard = Card(mpcSerialized: dict["blackCard"]!)
             let whiteCards = CardArray(mpcSerialized: dict["whiteCards"]!).array
             self.startGame(blackCard: blackCard, whiteCards: whiteCards)
@@ -74,7 +74,7 @@ final class MenuViewController: UIViewController, UICollectionViewDataSource, UI
 
     private func setupStartGameButton() {
         // Button
-        startGameButton.setTranslatesAutoresizingMaskIntoConstraints(false)
+        startGameButton.translatesAutoresizingMaskIntoConstraints = false
         startGameButton.titleLabel!.font = startGameButton.titleLabel!.font.fontWithSize(25)
         startGameButton.setTitle("Waiting For Players", forState: .Disabled)
         startGameButton.setTitle("Start Game", forState: .Normal)
@@ -96,7 +96,7 @@ final class MenuViewController: UIViewController, UICollectionViewDataSource, UI
         view.addSubview(separator)
 
         // Layout
-        layout(separator, startGameButton) { separator, startGameButton in
+        layout(separator, v2: startGameButton) { separator, startGameButton in
             separator.top == startGameButton.bottom + 10
             separator.centerX == separator.superview!.centerX
             separator.width == separator.superview!.width - 40
@@ -119,7 +119,7 @@ final class MenuViewController: UIViewController, UICollectionViewDataSource, UI
         view.addSubview(collectionView)
 
         // Layout
-        layout(collectionView, separator) { collectionView, separator in
+        layout(collectionView, v2: separator) { collectionView, separator in
             collectionView.top == separator.bottom
             collectionView.left == separator.left
             collectionView.right == separator.right

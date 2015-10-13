@@ -49,7 +49,7 @@ final class WhiteCardCell: UICollectionViewCell {
 
         // Layout
         layout(label) { label in
-            label.edges == inset(label.superview!.edges, 15, 10); return
+            label.edges == inset(label.superview!.edges, horizontal: 15, vertical: 10); return
         }
     }
 

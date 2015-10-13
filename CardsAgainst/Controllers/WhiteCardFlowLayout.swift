@@ -23,12 +23,12 @@ final class WhiteCardFlowLayout: UICollectionViewFlowLayout {
         let layoutAttributes = super.layoutAttributesForElementsInRect(rect)
         let topContentInset = collectionView!.contentInset.top + 20
         let transitionRegion = CGFloat(120)
-        for attributes in layoutAttributes as [UICollectionViewLayoutAttributes] {
+        for attributes in layoutAttributes! as [UICollectionViewLayoutAttributes] {
             let yOriginInSuperview = collectionView!.convertPoint(attributes.frame.origin, toView: collectionView!.superview).y
             if topContentInset > yOriginInSuperview {
                 let difference = topContentInset - yOriginInSuperview
                 let progress = difference/transitionRegion
-                attributes.alpha = easeInOut(min(progress, 1), 1, -0.95, 1)
+                attributes.alpha = easeInOut(min(progress, 1), b: 1, c: -0.95, d: 1)
             } else {
                 attributes.alpha = 1
             }

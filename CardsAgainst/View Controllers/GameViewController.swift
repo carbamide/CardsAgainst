@@ -40,7 +40,7 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
     private let pageControl = UIPageControl()
     private let scrollView = UIScrollView()
     private let scrollViewContentView = UIView()
-    private let voteButton = UIButton.buttonWithType(.System) as UIButton
+    private let voteButton = UIButton(type: .System) as UIButton
 
     // UI Helper
     private var blackCardLabelBottomConstraint = NSLayoutConstraint()
@@ -72,15 +72,15 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
         if votesForPlayers.count == 1 {
             return votesForPlayers.keys.first!
         }
-        let sortedVotes = votesForPlayers.values.array.sort { $0 > $1 }
+        let sortedVotes = Array(votesForPlayers.values).sort { $0 > $1 }
         let maxVotes = sortedVotes[0]
         if maxVotes == sortedVotes[1] {
             return nil // Tie
         }
-        return votesForPlayers.keys.array.filter({votesForPlayers[$0] == maxVotes}).first!
+        return Array(votesForPlayers.keys).filter({votesForPlayers[$0] == maxVotes}).first!
     }
     private var stats: String {
-        return scores.keys.array.map({ "\($0.displayName): \(self.scores[$0] ?? 0)" }).joinWithSeparator("\n")
+        return Array(scores.keys).map({ "\($0.displayName): \(self.scores[$0] ?? 0)" }).joinWithSeparator("\n")
     }
     private var unansweredPlayers: [Player] {
         let answeredPlayers = answers.map { $0.sender }
@@ -160,7 +160,7 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
 
     private func setupVoteButton() {
         // Button
-        voteButton.setTranslatesAutoresizingMaskIntoConstraints(false)
+        voteButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(voteButton)
         voteButton.enabled = false
         voteButton.titleLabel?.numberOfLines = 0
@@ -183,7 +183,7 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
         pageControl.numberOfPages = ConnectionManager.otherPlayers.count + 1
 
         // Layout
-        layout(pageControl, voteButton) { pageControl, voteButton in
+        layout(pageControl, v2: voteButton) { pageControl, voteButton in
             pageControl.bottom == voteButton.top
             pageControl.centerX == pageControl.superview!.centerX
         }
@@ -220,7 +220,7 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
         blackCardLabel.adjustsFontSizeToFitWidth = true
 
         // Layout
-        layout(blackCardLabel, scrollViewContentView) { blackCardLabel, scrollViewContentView in
+        layout(blackCardLabel, v2: scrollViewContentView) { blackCardLabel, scrollViewContentView in
             blackCardLabel.top == scrollViewContentView.top + 64
             blackCardLabel.width == scrollViewContentView.width - 32
             blackCardLabel.leading == scrollViewContentView.leading + 16
@@ -319,7 +319,7 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
             blackCardLabel.font = self.blackCardLabel.font // override remote font size with our own screen-specific size
 
             // Layout
-            layout(blackCardLabel, contentView) { blackCardLabel, contentView in
+            layout(blackCardLabel, v2: contentView) { blackCardLabel, contentView in
                 blackCardLabel.top == contentView.top + 64
                 blackCardLabel.width == contentView.width - 32
                 blackCardLabel.leading == contentView.leading + 16
@@ -333,7 +333,7 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
     private func setupMultipeerEventHandlers() {
         // Answer
         ConnectionManager.onEvent(.Answer) { peer, object in
-            let dict = object as [String: NSData]
+            let dict = object as! [String: NSData]
             let attr = MPCAttributedString(mpcSerialized: dict["answer"]!).attributedString
             self.answers.append(Answer(sender: Player(peer: peer), answer: attr))
             self.updateWaitingForPeers()
@@ -345,7 +345,6 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
         // Cancel Answer
         ConnectionManager.onEvent(.CancelAnswer) { peer, object in
             let sender = Player(peer: peer)
-            let previousCount = self.answers.count
             self.answers = self.answers.filter { $0.sender != sender }
             self.updateWaitingForPeers()
         }
@@ -353,13 +352,13 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
         // Vote
         ConnectionManager.onEvent(.Vote) { peer, object in
             let voter = Player(peer: peer)
-            let votee = Player(mpcSerialized: (object as [String: NSData])["votee"]!)
+            let votee = Player(mpcSerialized: (object as! [String: NSData])["votee"]!)
             self.addVote(voter, to: votee)
         }
 
         // Next Card
         ConnectionManager.onEvent(.NextCard) { _, object in
-            let dict = object as [String: NSData]
+            let dict = object as! [String: NSData]
             let winner = Player(mpcSerialized: dict["winner"]!)
             let blackCard = Card(mpcSerialized: dict["blackCard"]!)
             let whiteCards = CardArray(mpcSerialized: dict["whiteCards"]!).array
@@ -383,7 +382,7 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
         let blackCard = CardManager.nextCardsWithType(.Black).first!
         scores[winner]!++
         ConnectionManager.sendEventForEach(.NextCard) {
-            let nextWhiteCards = CardManager.nextCardsWithType(.White, count: 10 - self.whiteCards.count)
+            let nextWhiteCards = CardManager.nextCardsWithType(.White, count: UInt(10) - UInt(self.whiteCards.count))
             let payload: [String: MPCSerializable] = [
                 "blackCard": blackCard,
                 "whiteCards": CardArray(array: nextWhiteCards),
@@ -391,7 +390,7 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
             ]
             return payload
         }
-        let newWhiteCards = CardManager.nextCardsWithType(.White, count: 10 - whiteCards.count)
+        let newWhiteCards = CardManager.nextCardsWithType(.White, count: UInt(10) - UInt(whiteCards.count))
         nextBlackCard(blackCard, newWhiteCards: newWhiteCards, winner: winner)
     }
 
@@ -507,10 +506,10 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
         if let range = blackCardLabel.text?.rangeOfString(blackCardPlaceholder) {
             blackCardLabel.text = blackCardLabel.text?.stringByReplacingCharactersInRange(range, withString: selectedCard.content)
             let start = blackCardLabel.text!.startIndex.distanceTo(range.startIndex)
-            let length = countElements(selectedCard.content)
+            let length = selectedCard.content.characters.count
             blackCardLabel.placeholderRanges.append(NSMakeRange(start, length))
         } else {
-            let range = NSMakeRange(countElements(blackCardLabel.text!)+1, countElements(selectedCard.content))
+            let range = NSMakeRange(blackCardLabel.text!.characters.count+1, selectedCard.content.characters.count)
             blackCardLabel.placeholderRanges.append(range)
             blackCardLabel.text! += "\n\(selectedCard.content)"
         }
@@ -532,7 +531,7 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
                     self.view.bringSubviewToFront(self.voteButton)
             })
 
-            let attr = MPCAttributedString(attributedString: blackCardLabel.attributedText)
+            let attr = MPCAttributedString(attributedString: blackCardLabel.attributedText!)
             ConnectionManager.sendEvent(.Answer, object: ["answer": attr])
             prepareForBlackCards()
         }
@@ -549,7 +548,7 @@ final class GameViewController: UIViewController, UICollectionViewDataSource, UI
                 self.whiteCardCollectionView.insertItemsAtIndexPaths([indexPath])
                 }, completion: nil)
             blackCardLabel.text = blackCardLabelNSString.stringByReplacingCharactersInRange(lastRange, withString: blackCardPlaceholder)
-            let placeholderlessLength = countElements(blackCardPlaceholder) + 1
+            let placeholderlessLength = blackCardPlaceholder.characters.count + 1
 
             let blackCardLabelSubstring = blackCardLabelNSString.substringFromIndex(blackCardLabelNSString.length - placeholderlessLength)
             if blackCardLabelSubstring == "\n\(blackCardPlaceholder)" {

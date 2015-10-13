@@ -13,20 +13,24 @@ private let pg13 = true
 private func loadCards() -> ([Card], [Card]) {
     let resourceName = pg13 ? "cards_pg13" : "cards"
     let jsonPath = NSBundle.mainBundle().pathForResource(resourceName, ofType: "json")
-    let cards = NSJSONSerialization.JSONObjectWithData(NSData(contentsOfFile: jsonPath!)!, options: nil, error: nil) as [[String: String]]
-
+    
     var whiteCards = [Card]()
     var blackCards = [Card]()
-
-    for card in cards {
-        let card = Card(content: card["text"]!,
-            type: CardType(rawValue: card["cardType"]!)!,
-            expansion: card["expansion"]!)
-        if card.type == .White {
-            whiteCards.append(card)
-        } else {
-            blackCards.append(card)
+    
+    do {
+        let cards = try NSJSONSerialization.JSONObjectWithData(NSData(contentsOfFile: jsonPath!)!, options: []) as! [[String: String]]
+        for card in cards {
+            let card = Card(content: card["text"]!,
+                type: CardType(rawValue: card["cardType"]!)!,
+                expansion: card["expansion"]!)
+            if card.type == .White {
+                whiteCards.append(card)
+            } else {
+                blackCards.append(card)
+            }
         }
+    } catch {
+        // Error
     }
 
     return (blackCards, whiteCards)
