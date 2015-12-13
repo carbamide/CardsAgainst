@@ -19,6 +19,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Window
         window!.rootViewController = UINavigationController(rootViewController: MenuViewController())
+        (window!.rootViewController as! UINavigationController).interactivePopGestureRecognizer!.enabled = false;
+
         window!.makeKeyAndVisible()
 
         // Appearance
